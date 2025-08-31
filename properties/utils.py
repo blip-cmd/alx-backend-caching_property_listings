@@ -2,6 +2,7 @@ import logging
 from django.core.cache import cache
 from django_redis import get_redis_connection
 from .models import Property
+
 def get_all_properties():
     properties = cache.get('all_properties')
     if properties is None:
@@ -21,27 +22,11 @@ def get_redis_cache_metrics():
         metrics = {
             'hits': hits,
             'misses': misses,
-            import logging
-            from django.core.cache import cache
-            from django_redis import get_redis_connection
-            from .models import Property
+            'hit_ratio': hit_ratio
+        }
+        logger.info(f"Redis cache metrics: {metrics}")
+        return metrics
 
-            except Exception as e:
-                logger.error(f"Error retrieving Redis cache metrics: {e}")
-                return {'hits': 0, 'misses': 0, 'hit_ratio': 0}
-                info = redis_conn.info()
-                hits = info.get('keyspace_hits', 0)
-                misses = info.get('keyspace_misses', 0)
-
-                total_requests = hits + misses
-                hit_ratio = (hits / total_requests) if total_requests > 0 else 0
-                metrics = {
-                    'hits': hits,
-                    'misses': misses,
-                    'hit_ratio': hit_ratio
-                }
-                logger.info(f"Redis cache metrics: {metrics}")
-                return metrics
-            except Exception as e:
-                logger.error(f"Error retrieving Redis cache metrics: {e}")
-                return {'hits': 0, 'misses': 0, 'hit_ratio': 0}
+    except Exception as e:
+        logger.error(f"Error retrieving Redis cache metrics: {e}")
+        return {'hits': 0, 'misses': 0, 'hit_ratio': 0}
